@@ -1,0 +1,98 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Brand Colors */
+  --primary-color: #133F40;
+  --secondary-color: #F4EDDC;
+  --text-dark: #0A0A0ACC;
+  --text-light: #666666;
+  --white: #ffffff;
+  --border-color: #e0e0e0;
+  
+  /* Bootstrap Overrides */
+  --bs-primary: #2C5F5D;
+  --bs-primary-rgb: 44, 95, 93;
+  --bs-body-bg: #F5F1E8;
+  --bs-body-color: #666666;
+  --bs-link-color: #2C5F5D;
+  --bs-link-hover-color: #234d4b;
+}
+
+body {
+  font-family: var(--font-montserrat), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+a, 
+button,
+.btn {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+a {
+  color: black;
+  text-decoration: none;
+}
+
+p {
+  font-weight: 400;
+  font-style: normal;        
+}
+
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-radius: 8px;
+  border-color: #2C5F5D;
+}
+
+.btn-primary:hover {
+  background-color: #2C5F5D;
+  border-radius: 8px;
+}
+
+.text-green{
+  color: #133F40;
+}
+
+.bg-secondary{
+  background-color: #F4EDDC;
+}
+
+.bg-info{
+  background-color: #FAFAF8 !important;
+}
+
+#hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5); /* adjust opacity */
+  pointer-events: none;
+}
+
+#hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;           /* matches image ratio */
+  background-image:
+    url('/cover-image.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.primary-font { 
+    font-family: var(--font-montserrat), system-ui, -apple-system, sans-serif !important;
+}
+
+.secondary-font { 
+    font-family: var(--font-inter), system-ui, -apple-system, sans-serif !important;
+}
