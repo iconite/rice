@@ -1,9 +1,23 @@
+export interface ProductType {
+  title: string;
+  origin: string;
+  description: string;
+  image: string;
+  slug: string;
+  // Optional details for the single page view
+  climate?: string;
+  growingSeason?: string;
+  yield?: string;
+  detailedDescription?: string;
+}
+
 export interface Product {
   title: string;
   origin: string;
   description: string;
   image: string;
   varieties?: string[];
+  types?: ProductType[];
   slug: string;
   // Extended details for the single page view
   climate?: string;
@@ -23,6 +37,41 @@ export const products: Product[] = [
       'Rice type 1 - Aromatic basmati with soft texture',
       'Rice type 2 - Suitable for biryani',
       'Rice type 3 - Traditional variety with unique flavor'
+    ],
+    types: [
+        {
+            title: 'Rice Type 1',
+            origin: 'India',
+            description: 'Aromatic basmati with soft texture and distinctive flavor.',
+            detailedDescription: 'This premium Basmati variety is aged to perfection to ensure the best aroma and fluffy texture. Sourced from the foothills of the Himalayas, it is the preferred choice for royal biryanis and gourmet dishes.',
+            image: '/products/rice.png',
+            slug: 'rice-type-1',
+            climate: 'Sub-tropical',
+            growingSeason: '120 days',
+            yield: '4 tons/ha'
+        },
+        {
+            title: 'Rice Type 2',
+            origin: 'India',
+            description: 'Perfect for daily cooking with great taste and aroma.',
+            detailedDescription: 'A versatile rice variety that is excellent for everyday meals. It has a non-sticky texture and absorbs flavors well, making it ideal for fried rice, pulao, and plain steamed rice.',
+            image: '/products/rice.png', 
+            slug: 'rice-type-2',
+            climate: 'Tropical',
+            growingSeason: '110 days',
+            yield: '5 tons/ha'
+        },
+        {
+            title: 'Rice Type 3',
+            origin: 'South India',
+            description: 'Traditional variety known for its nutritional value.',
+            detailedDescription: 'This traditional variety is prized for its health benefits and unique nutty flavor. Often used in traditional South Indian dishes, it is rich in fiber and essential minerals.',
+            image: '/products/rice.png',
+            slug: 'rice-type-3',
+            climate: 'Warm & Humid',
+            growingSeason: '130 days',
+            yield: '3.5 tons/ha'
+        }
     ],
     slug: 'rice',
     climate: 'Tropical',

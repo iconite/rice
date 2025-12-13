@@ -6,31 +6,97 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export function generateStaticParams() {
-  return products.map((product) => ({
-    slug: product.slug,
-  }));
+  const mainSlugs = products.map((product) => ({ slug: product.slug }));
+  const subSlugs = products.flatMap((p) => p.types || []).map((t) => ({ slug: t.slug }));
+  return [...mainSlugs, ...subSlugs];
 }
+
+import ProductCard from '@/components/ProductCard';
 
 export default async function ProductDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = products.find((p) => p.slug === slug);
+  
+  // Find product and potentially its parent
+  let product: any = products.find((p) => p.slug === slug);
+  let backLink = "/products";
+  let backLabel = "Back to Products";
+
+  if (!product) {
+    // Access sub-category via parent
+    const parent = products.find(p => p.types?.some(t => t.slug === slug));
+    if (parent) {
+      product = parent.types?.find((t: any) => t.slug === slug);
+      backLink = `/products/${parent.slug}`;
+      backLabel = `Back to ${parent.title}`;
+    }
+  }
 
   if (!product) {
     notFound();
   }
 
-  // If product has varieties ("dub categories"), we might want to show a different view
-  // But for this request, I will render the specific design requested.
-  // We can add a check here later if needed.
+  // If product has sub-categories (types), show the listing view
+  if (product.types && product.types.length > 0) {
+    return (
+      <>
+        <Header />
+        <main className="py-5 bg-light min-vh-100">
+          <div className="container mb-4">
+            <Link href="/products" className="text-decoration-none text-muted d-flex align-items-center gap-2 small fw-medium">
+              <i className="bi bi-arrow-left"></i> Back to Products
+            </Link>
+          </div>
+          
+          <div className="container">
+            <div className="mb-5">
+              <h3 className="fw-semibold text-dark mb-3">Types of {product.title}</h3>
+              <p className="text-secondary">
+                Explore our premium range of {product.title.toLowerCase()} and agricultural products. Each product is available in multiple varieties to meet your specific requirements.
+              </p>
+            </div>
 
+            <div className="bg-white p-4 rounded-3 shadow-sm mb-5 d-flex align-items-center flex-wrap gap-3">
+              <button className="btn btn-outline-secondary d-flex align-items-center gap-2 primary-font">
+                <i className="bi bi-funnel"></i> Filter by:
+              </button>
+              <div className="d-flex gap-2 flex-wrap flex-grow-1">
+                <button className="btn btn-outline-secondary rounded-pill px-4 border-light bg-light text-dark">Origin</button>
+                <button className="btn btn-outline-secondary rounded-pill px-4 border-light bg-light text-dark">High Demand</button>
+              </div>
+            </div>
+
+            <div className="row g-4">
+              {product.types.map((type: any, index: number) => (
+                <div key={index} className="col-lg-4 col-md-6">
+                  {/* Using ProductCard for types. Note: ProductCard expects a slug. 
+                      Clicking these will go to /products/[slug]. 
+                      We haven't defined pages for 'rice-type-1' yet, so they will 404 unless handled. */}
+                  <ProductCard 
+                    title={type.title}
+                    origin={type.origin}
+                    description={type.description}
+                    image={type.image}
+                    slug={type.slug}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  // Default Detail View for single products
   return (
     <>
       <Header />
       <main className="bg-white min-vh-100 pb-5">
         {/* Breadcrumb */}
         <div className="container py-4">
-          <Link href="/products" className="text-decoration-none text-muted d-flex align-items-center gap-2 small fw-medium">
-            <i className="bi bi-arrow-left"></i> Back to Products
+          <Link href={backLink} className="text-decoration-none text-muted d-flex align-items-center gap-2 small fw-medium">
+            <i className="bi bi-arrow-left"></i> {backLabel}
           </Link>
         </div>
 
