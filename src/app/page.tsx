@@ -2,66 +2,12 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import ProductCard from '@/components/ProductCard';
+import { products } from '@/lib/products';
 
 
 export default function Home() {
-  const products = [
-    {
-      title: 'Spices',
-      origin: 'India',
-      description: 'Aromatic flavors used in cooking for their distinctive taste and aroma.',
-      image: '/products/spices.png',
-      varieties: ['Turmeric', 'Cumin', 'Coriander', 'Black Pepper'],
-      slug: 'spices'
-    },
-    {
-      title: 'Coconut',
-      origin: 'Sri Lanka',
-      description: 'Fresh coconuts are sourced from Sri Lanka and Brazil, and...',
-      image: '/products/coconut.png',
-      varieties: ['King Coconut', 'Regular Coconut'],
-      slug: 'coconut'
-    },
-    {
-      title: 'Rice',
-      origin: 'India & Pakistan',
-      description: 'Aromatic basmati rice with flavor and texture.',
-      image: '/products/rice.png',
-      varieties: ['Rice type 1', 'Rice type 2', 'Rice type 3'],
-      slug: 'rice'
-    },
-    {
-      title: 'Moringa',
-      origin: 'India & Vietnam',
-      description: 'King of spices, essential in cuisines worldwide.',
-      image: '/products/moringa.png',
-      varieties: ['Tellicherry Black Pepper', 'Malabar Black Pepper'],
-      slug: 'moringa'
-    },
-    {
-      title: 'Exotic Seeds',
-      origin: 'Sri Lanka',
-      description: 'Exotic seeds with a very special taste of Sri Lanka.',
-      image: '/products/nuts.png',
-      varieties: ['Sage Coriander', 'Basil Seeds'],
-      slug: 'exotic-seeds'
-    },
-    {
-      title: 'Cow Dung',
-      origin: 'India',
-      description: 'Aromatic seeds with a crispy and sweet notes.',
-      image: '/products/cowdung.png',
-      slug: 'cow-dung'
-    },
-    {
-      title: 'Fresh Vegetables',
-      origin: 'Sri Lanka & India',
-      description: 'Fruits and vegetables are globally essential for their fresh nutrition, vibra...',
-      image: '/products/fruits.png',
-      varieties: ['Ceylon Cinnamon', 'Cassia Cinnamon', 'Cinnamon Powder'],
-      slug: 'vegetables'
-    }
-  ];
+  // Use first 3 products for homepage or specific logic
+  const displayProducts = products.slice(0, 3); // Example or filter logic
 
   return (
     <>

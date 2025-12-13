@@ -63,7 +63,7 @@ p {
 }
 
 .bg-secondary{
-  background-color: #F4EDDC;
+  background-color: #F4EDDC !important;
 }
 
 .bg-info{
