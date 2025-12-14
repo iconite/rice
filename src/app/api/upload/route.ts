@@ -1,7 +1,13 @@
-
 import { NextResponse } from 'next/server';
-import path from 'path';
-import fs from 'fs/promises';
+import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
+
+// Cloudinary Config
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(request: Request) {
   try {
@@ -13,27 +19,31 @@ export async function POST(request: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    // Sanitize filename to avoid directory traversal or weird characters
-    const filename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    
-    // Ensure unique filename if needed, or just overwrite. 
-    // For simplicity, we'll prefix with timestamp to avoid caching/overwrite collisions unless intended.
-    const uniqueFilename = `${Date.now()}-${filename}`;
-    
-    const uploadDir = path.join(process.cwd(), 'public/products'); // Use absolute path approach if needed, but relative to cwd works generally
-    
-    // Ensure directory exists
-    try {
-        await fs.access(uploadDir);
-    } catch {
-        await fs.mkdir(uploadDir, { recursive: true });
-    }
 
-    const filePath = path.join(uploadDir, uniqueFilename);
-    await fs.writeFile(filePath, buffer);
+    // Upload to Cloudinary using a stream
+    const result: any = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: 'rice_products', // Optional folder in Cloudinary
+            },
+            (error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            }
+        );
 
-    // Return the public URL
-    return NextResponse.json({ url: `/products/${uniqueFilename}` });
+        // Convert buffer to readable stream
+        const stream = new Readable();
+        stream.push(buffer);
+        stream.push(null); // End of stream
+        stream.pipe(uploadStream);
+    });
+
+    return NextResponse.json({ url: result.secure_url });
+
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
