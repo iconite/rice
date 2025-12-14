@@ -1,13 +1,16 @@
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { getSiteData } from '@/lib/data';
 
 export const metadata: Metadata = {
   title: "Contact Us",
   description: "Get in touch with Iconite Earth for inquiries about our premium products.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const { contact } = await getSiteData();
+
   return (
     <>
       <Header />
@@ -38,7 +41,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="small text-muted mb-0">Email</p>
-                      <a href="mailto:info@iconiteearth.com" className="text-dark text-decoration-none fw-medium">info@iconiteearth.com</a>
+                      <a href={`mailto:${contact.email}`} className="text-dark text-decoration-none fw-medium">{contact.email}</a>
                     </div>
                   </div>
 
@@ -48,7 +51,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="small text-muted mb-0">Phone</p>
-                      <a href="tel:+911234567890" className="text-dark text-decoration-none fw-medium">+91 (123) 456-7890</a>
+                      <a href={`tel:${contact.phone.replace(/\D/g, '')}`} className="text-dark text-decoration-none fw-medium">{contact.phone}</a>
                     </div>
                   </div>
 
@@ -58,7 +61,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="small text-muted mb-0">Address</p>
-                      <p className="text-dark mb-0 fw-medium">123 Export Plaza<br />Mumbai, India 400001</p>
+                      <p className="text-dark mb-0 fw-medium" style={{ whiteSpace: 'pre-line' }}>{contact.address}</p>
                     </div>
                   </div>
                 </div>
@@ -119,8 +122,8 @@ export default function ContactPage() {
 
                   <div className="mb-4">
                     <label htmlFor="productType" className="form-label small fw-medium text-dark">Product Type *</label>
-                    <select className="form-select py-2 bg-light border-light text-secondary" id="productType">
-                      <option selected>Select product...</option>
+                    <select className="form-select py-2 bg-light border-light text-secondary" id="productType" defaultValue="">
+                      <option value="" disabled>Select product...</option>
                       <option value="rice">Rice</option>
                       <option value="spices">Spices</option>
                       <option value="fruit-veg">Fruits & Vegetables</option>

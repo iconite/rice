@@ -9,6 +9,7 @@ export interface ProductType {
   growingSeason?: string;
   yield?: string;
   detailedDescription?: string;
+  isHighDemand?: boolean;
 }
 
 export interface Product {
@@ -24,6 +25,7 @@ export interface Product {
   growingSeason?: string;
   yield?: string;
   detailedDescription?: string;
+  isHighDemand?: boolean;
 }
 
 export const products: Product[] = [

@@ -1,6 +1,9 @@
 import Link from 'next/link';
+import { getSiteData } from '@/lib/data';
 
-export default function Footer() {
+export default async function Footer() {
+  const { contact } = await getSiteData();
+
   return (
     <footer className="bg-primary text-white py-5 mt-5 primary-font">
       <div className="container">
@@ -32,34 +35,47 @@ Your trusted partner for premium quality spices, grains, and agricultural produc
           <div className="col-lg-3 col-md-6">
             <h5 className="text-white fw-semibold mb-4">Our Products</h5>
             <ul className="list-unstyled">
-              <li className="mb-2"><Link href="/products#spices" className="text-white-50 text-decoration-none">Spices</Link></li>
-              <li className="mb-2"><Link href="/products#rice" className="text-white-50 text-decoration-none">Rice</Link></li>
-              <li className="mb-2"><Link href="/products#coconut" className="text-white-50 text-decoration-none">Coconut</Link></li>
-              <li className="mb-2"><Link href="/products#moringa" className="text-white-50 text-decoration-none">Moringa</Link></li>
-              <li className="mb-2"><Link href="/products#seeds" className="text-white-50 text-decoration-none">Exotic Seeds</Link></li>
-              <li className="mb-2"><Link href="/products#vegetables" className="text-white-50 text-decoration-none">Fresh Vegetables</Link></li>
+              <li className="mb-2"><Link href="/products?search=spices" className="text-white-50 text-decoration-none">Spices</Link></li>
+              <li className="mb-2"><Link href="/products?search=rice" className="text-white-50 text-decoration-none">Rice</Link></li>
+              <li className="mb-2"><Link href="/products?search=coconut" className="text-white-50 text-decoration-none">Coconut</Link></li>
+              <li className="mb-2"><Link href="/products?search=moringa" className="text-white-50 text-decoration-none">Moringa</Link></li>
             </ul>
           </div>
 
           <div className="col-lg-3 col-md-6">
             <h5 className="text-white fw-semibold mb-4">Contact Us</h5>
             <div className="text-white-50">
-              <p className="d-flex align-items-start gap-2 mb-3">
-                <i className="bi bi-geo-alt-fill mt-1"></i>
-                123 Export Street, Colombo 00700, Sri Lanka
-              </p>
-              <p className="d-flex align-items-start gap-2 mb-3">
-                <i className="bi bi-telephone-fill mt-1"></i>
-                +94 (11) 234 5678
-              </p>
-              <p className="d-flex align-items-start gap-2 mb-3">
-                <i className="bi bi-envelope-fill mt-1"></i>
-                info@iconiteearth.com
-              </p>
-              <p className="d-flex align-items-start gap-2 mb-3">
-                <i className="bi bi-clock-fill mt-1"></i>
-                Mon - Fri: 9:00 AM - 6:00 PM
-              </p>
+              {/* Address: Align Start for multi-line */}
+              <div className="d-flex align-items-start mb-3">
+                <div className="flex-shrink-0 me-3" style={{ width: '20px', marginTop: '2px' }}>
+                    <i className="bi bi-geo-alt-fill"></i>
+                </div>
+                <span className="lh-sm" style={{ whiteSpace: 'pre-line' }}>{contact.address}</span>
+              </div>
+
+              {/* Phone: Align Center */}
+              <a href={`tel:${contact.phone.replace(/[^\d+]/g, '')}`} className="d-flex align-items-center mb-3 text-white-50 text-decoration-none hover-white">
+                 <div className="flex-shrink-0 me-3" style={{ width: '20px' }}>
+                    <i className="bi bi-telephone-fill"></i>
+                 </div>
+                 <span>{contact.phone}</span>
+              </a>
+
+              {/* Email: Align Center */}
+              <a href={`mailto:${contact.email}`} className="d-flex align-items-center mb-3 text-white-50 text-decoration-none hover-white">
+                <div className="flex-shrink-0 me-3" style={{ width: '20px' }}>
+                    <i className="bi bi-envelope-fill"></i>
+                </div>
+                <span>{contact.email}</span>
+              </a>
+
+              {/* Time: Align Center */}
+              <div className="d-flex align-items-center mb-3">
+                <div className="flex-shrink-0 me-3" style={{ width: '20px' }}>
+                    <i className="bi bi-clock-fill"></i>
+                </div>
+                <span>Mon - Fri: 9:00 AM - 6:00 PM</span>
+              </div>
             </div>
           </div>
         </div>

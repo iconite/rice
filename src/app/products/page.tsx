@@ -8,9 +8,12 @@ export const metadata: Metadata = {
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/lib/products';
+import { getSiteData } from '@/lib/data';
+import ProductList from '@/components/ProductList';
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const { products } = await getSiteData();
+
   return (
     <>
       <Header />
@@ -24,24 +27,7 @@ export default function ProductsPage() {
             </p>
           </div>
 
-          <div className="bg-white p-4 rounded-3 shadow-sm mb-5 d-flex align-items-center flex-wrap gap-3">
-            <button className="btn btn-outline-secondary d-flex align-items-center gap-2 primary-font">
-              <i className="bi bi-funnel"></i> Filter by:
-            </button>
-            <div className="d-flex gap-2 flex-wrap flex-grow-1">
-              <button className="btn btn-primary rounded-pill px-4">Origin</button>
-              <button className="btn btn-outline-secondary rounded-pill px-4 border-light bg-light text-dark">High Demand</button>
-              <button className="btn btn-outline-secondary rounded-pill px-4 border-light bg-light text-dark">Category</button>
-            </div>
-          </div>
-
-          <div className="row g-4">
-            {products.map((product, index) => (
-              <div key={index} className="col-lg-4 col-md-6">
-                <ProductCard {...product} />
-              </div>
-            ))}
-          </div>
+          <ProductList products={products} />
         </div>
       </main>
 

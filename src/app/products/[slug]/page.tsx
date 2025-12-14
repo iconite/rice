@@ -2,13 +2,14 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { products } from '@/lib/products';
+import { getSiteData } from '@/lib/data';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  const { products } = await getSiteData();
   const product: any = products.find((p) => p.slug === slug) || 
                        products.flatMap((p) => p.types || []).find((t) => t.slug === slug);
 
@@ -27,7 +28,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const { products } = await getSiteData();
   const mainSlugs = products.map((product) => ({ slug: product.slug }));
   const subSlugs = products.flatMap((p) => p.types || []).map((t) => ({ slug: t.slug }));
   return [...mainSlugs, ...subSlugs];
@@ -37,19 +39,29 @@ import ProductCard from '@/components/ProductCard';
 
 export default async function ProductDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const { products } = await getSiteData();
   
   // Find product and potentially its parent
   let product: any = products.find((p) => p.slug === slug);
+  let parentProduct: any = null;
   let backLink = "/products";
   let backLabel = "Back to Products";
 
   if (!product) {
     // Access sub-category via parent
-    const parent = products.find(p => p.types?.some(t => t.slug === slug));
-    if (parent) {
-      product = parent.types?.find((t: any) => t.slug === slug);
-      backLink = `/products/${parent.slug}`;
-      backLabel = `Back to ${parent.title}`;
+    parentProduct = products.find(p => p.types?.some(t => t.slug === slug));
+    if (parentProduct) {
+      product = parentProduct.types?.find((t: any) => t.slug === slug);
+      backLink = `/products/${parentProduct.slug}`;
+      backLabel = `Back to ${parentProduct.title}`;
+      
+      // Inherit stats from parent if missing
+      if (product) {
+          if (!product.origin) product.origin = parentProduct.origin;
+          if (!product.climate) product.climate = parentProduct.climate;
+          if (!product.growingSeason) product.growingSeason = parentProduct.growingSeason;
+          if (!product.yield) product.yield = parentProduct.yield;
+      }
     }
   }
 
@@ -72,9 +84,57 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
           <div className="container">
             <div className="mb-5">
               <h3 className="fw-semibold text-dark mb-3">Types of {product.title}</h3>
-              <p className="text-secondary">
+              <p className="text-secondary mb-4">
                 Explore our premium range of {product.title.toLowerCase()} and agricultural products. Each product is available in multiple varieties to meet your specific requirements.
+                {product.detailedDescription && <span className="d-block mt-2">{product.detailedDescription}</span>}
               </p>
+
+              {/* Parent Stats Grid */}
+              <div className="row g-3">
+                {product.origin && (
+                  <div className="col-md-3 col-6">
+                    <div className="p-3 bg-white border rounded-3 h-100">
+                      <p className="text-green mb-1 d-flex align-items-center gap-2 small">
+                         <i className="bi bi-geo-alt"></i> Origin
+                      </p>
+                      <p className="fw-medium mb-0 text-dark small">{product.origin}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {product.climate && (
+                  <div className="col-md-3 col-6">
+                    <div className="p-3 bg-white border rounded-3 h-100">
+                      <p className=" text-green mb-1 d-flex align-items-center gap-2 small">
+                        <i className="bi bi-cloud-sun"></i> Climate
+                      </p>
+                      <p className="fw-medium mb-0 text-dark small">{product.climate}</p>
+                    </div>
+                  </div>
+                )}
+
+                {product.growingSeason && (
+                  <div className="col-md-3 col-6">
+                    <div className="p-3 bg-white border rounded-3 h-100">
+                      <p className="text-green mb-1 d-flex align-items-center gap-2 small">
+                        <i className="bi bi-calendar-event"></i> Growing Season
+                      </p>
+                      <p className="fw-medium mb-0 text-dark small">{product.growingSeason}</p>
+                    </div>
+                  </div>
+                )}
+
+                {product.yield && (
+                  <div className="col-md-3 col-6">
+                    <div className="p-3 bg-white border rounded-3 h-100">
+                      <p className="text-green mb-1 d-flex align-items-center gap-2 small">
+                        <i className="bi bi-bar-chart"></i> Yield
+                      </p>
+                      <p className="fw-medium mb-0 text-dark small">{product.yield}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="bg-white p-4 rounded-3 shadow-sm mb-5 d-flex align-items-center flex-wrap gap-3">
@@ -99,6 +159,9 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
                     description={type.description}
                     image={type.image}
                     slug={type.slug}
+                    climate={type.climate}
+                    growingSeason={type.growingSeason}
+                    yield={type.yield}
                   />
                 </div>
               ))}
@@ -156,38 +219,49 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
 
               {/* Stats Grid */}
               <div className="row g-3 mb-4">
-                <div className="col-6">
-                  <div className="p-3 border rounded-3 h-100">
-                    <p className="text-green mb-1 d-flex align-items-center gap-2">
-                       <i className="bi bi-geo-alt"></i> Origin
-                    </p>
-                    <p className="fw-medium mb-0 text-dark">{product.origin}</p>
+                {product.origin && (
+                  <div className="col-6">
+                    <div className="p-3 border rounded-3 h-100">
+                      <p className="text-green mb-1 d-flex align-items-center gap-2">
+                         <i className="bi bi-geo-alt"></i> Origin
+                      </p>
+                      <p className="fw-medium mb-0 text-dark">{product.origin}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="col-6">
-                  <div className="p-3 border rounded-3 h-100">
-                    <p className=" text-green mb-1 d-flex align-items-center gap-2">
-                      <i className="bi bi-cloud-sun"></i> Climate
-                    </p>
-                    <p className="fw-medium mb-0 text-dark">{product.climate || 'Tropical'}</p>
+                )}
+                
+                {product.climate && (
+                  <div className="col-6">
+                    <div className="p-3 border rounded-3 h-100">
+                      <p className=" text-green mb-1 d-flex align-items-center gap-2">
+                        <i className="bi bi-cloud-sun"></i> Climate
+                      </p>
+                      <p className="fw-medium mb-0 text-dark">{product.climate}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="col-6">
-                  <div className="p-3 border rounded-3 h-100">
-                    <p className="text-green mb-1 d-flex align-items-center gap-2">
-                      <i className="bi bi-calendar-event"></i> Growing Season
-                    </p>
-                    <p className="fw-medium mb-0 text-dark">{product.growingSeason || 'Seasonal'}</p>
+                )}
+
+                {product.growingSeason && (
+                  <div className="col-6">
+                    <div className="p-3 border rounded-3 h-100">
+                      <p className="text-green mb-1 d-flex align-items-center gap-2">
+                        <i className="bi bi-calendar-event"></i> Growing Season
+                      </p>
+                      <p className="fw-medium mb-0 text-dark">{product.growingSeason}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="col-6">
-                  <div className="p-3 border rounded-3 h-100">
-                    <p className="text-green mb-1 d-flex align-items-center gap-2">
-                      <i className="bi bi-bar-chart"></i> Yield
-                    </p>
-                    <p className="fw-medium mb-0 text-dark">{product.yield || 'High Yield'}</p>
+                )}
+
+                {product.yield && (
+                  <div className="col-6">
+                    <div className="p-3 border rounded-3 h-100">
+                      <p className="text-green mb-1 d-flex align-items-center gap-2">
+                        <i className="bi bi-bar-chart"></i> Yield
+                      </p>
+                      <p className="fw-medium mb-0 text-dark">{product.yield}</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

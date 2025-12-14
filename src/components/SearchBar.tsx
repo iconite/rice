@@ -1,19 +1,36 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-export default function SearchBar() {
+interface Tag {
+  title: string;
+  slug: string;
+}
+
+interface SearchBarProps {
+  popularTags?: Tag[];
+}
+
+export default function SearchBar({ popularTags }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
-  const categories = [
-    'Bay leaves',
-    'Turmeric',
-    'Basmati Rice',
-    'Cardamom'
+  const categories: Tag[] = popularTags && popularTags.length > 0 
+    ? popularTags 
+    : [
+    { title: 'Bay leaves', slug: 'bay-leaves' },
+    { title: 'Turmeric', slug: 'turmeric' },
+    { title: 'Basmati Rice', slug: 'rice' },
+    { title: 'Cardamom', slug: 'cardamom' }
   ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (searchQuery.trim()) {
+        router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   return (
@@ -32,15 +49,16 @@ export default function SearchBar() {
               Search
             </button>
           </div>
-          <div className="d-flex gap-2 flex-wrap overflow-auto pb-2 text-green">
-            Popular:
+          <div className="d-flex gap-2 flex-wrap overflow-auto pb-2 text-green align-items-center">
+            <span className="me-2">Popular:</span>
             {categories.map((category) => (
-              <p
-                key={category}
-                className={` px-3`}
+              <Link
+                key={category.slug}
+                href={`/products/${category.slug}`}
+                className=" text-primary px-3 fw-medium"
               >
-                {category}
-              </p>
+                {category.title}
+              </Link>
             ))}
           </div>
         </form>

@@ -1,18 +1,32 @@
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/lib/products';
+import { getSiteData } from '@/lib/data';
 
 
-export default function Home() {
-  // Use first 3 products for homepage or specific logic
-  const displayProducts = products.slice(0, 3); // Example or filter logic
+export default async function Home() {
+  const { products } = await getSiteData();
+  // Sort products: High Demand first, then others. Slice to first 3.
+  const displayProducts = [...products]
+    .sort((a, b) => {
+        // High Demand first
+        if (a.isHighDemand === b.isHighDemand) return 0;
+        return a.isHighDemand ? -1 : 1;
+    })
+    .slice(0, 3);
+  
+  // Popular tags for search bar: strictly the high demand ones, or if none, the top 3 items
+  const highDemandProducts = products.filter(p => p.isHighDemand);
+  const popularTags = highDemandProducts.length > 0 
+    ? highDemandProducts.map(p => ({ title: p.title, slug: p.slug }))
+    : displayProducts.map(p => ({ title: p.title, slug: p.slug }));
 
   return (
     <>
       <Header />
-      <SearchBar />
+      <SearchBar popularTags={popularTags} />
       
       <main>
         {/* Hero Section */}
@@ -21,13 +35,13 @@ export default function Home() {
           <div className="container position-relative z-2">
             <div >
               <h1 className="display-4 fw-semibold mb-4 ls-1">GLOBAL EXPORT & DELIVERY</h1>
-              <p className="lead mb-5 opacity-75">
+              <h3 className="fw-medium mb-5 opacity-75">
                 Serving customers worldwide with JDC shipping and consistent<br className="d-none d-md-block" />
                 quality that meets international standards.
-              </p>
+              </h3>
               <div className="d-flex gap-3  flex-wrap">
-                <button className="btn btn-primary px-4 shadow-sm primary-font p-3">View Products <i className="bi bi-arrow-right ms-2"></i></button>
-                <button className="btn btn-light px-4 primary-font p-3">Contact Us</button>
+                <Link href="/products" className="btn btn-primary px-4 shadow-sm primary-font p-3 text-decoration-none">View Products <i className="bi bi-arrow-right ms-2"></i></Link>
+                <Link href="/contact" className="btn btn-light px-4 primary-font p-3 text-decoration-none">Contact Us</Link>
               </div>
             </div>
           </div>
@@ -52,13 +66,13 @@ export default function Home() {
         <section className="py-5 bg-info">
           <div className="container py-4">
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 gap-3">
-              <h2 className="display-6 fw-semibold text-dark mb-0">Our Premium Products</h2>
-              <a href="/products" className="text-primary text-decoration-none fw-medium d-flex align-items-center gap-2 hover-translate">
+              <h2 className="display-6 fw-semibold text-dark mb-0">Popular Products</h2>
+              <Link href="/products" className="text-primary text-decoration-none fw-medium d-flex align-items-center gap-2 hover-translate">
                 View All Products <i className="bi bi-arrow-right"></i>
-              </a>
+              </Link>
             </div>
             <div className="row g-4">
-              {products.map((product, index) => (
+              {displayProducts.map((product, index) => (
                 <div key={index} className="col-lg-4 col-md-6">
                   <ProductCard {...product} />
                 </div>
@@ -74,7 +88,7 @@ export default function Home() {
             <p className="lead mb-4 opacity-75">
               Contact us today to make custom orders and find the best products.
             </p>
-            <button className="btn btn-white text-primary bg-white fw-semibold px-5 py-3 shadow-sm hover-lift">Get In Touch <i className="bi bi-arrow-right ms-2"></i></button>
+            <Link href="/contact" className="btn btn-white text-primary bg-white fw-semibold px-5 py-3 shadow-sm hover-lift text-decoration-none">Get In Touch <i className="bi bi-arrow-right ms-2"></i></Link>
           </div>
         </section>
       </main>
