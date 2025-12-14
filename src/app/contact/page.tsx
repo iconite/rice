@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+export const metadata: Metadata = {
+  title: "Contact Us",
+  description: "Get in touch with Iconite Earth for inquiries about our premium products.",
+};
 
 export default function ContactPage() {
   return (
@@ -9,7 +15,7 @@ export default function ContactPage() {
         {/* Page Header */}
         <section className="py-5 text-center">
           <div className="container">
-            <h3 className="fw-semibold mb-3 text-dark">Contact Us</h3>
+            <h1 className="fw-semibold h3 mb-3 text-dark">Contact Us</h1>
             <p className="text-secondary mb-0">
               Ready to place an order or have questions? We're here to help you.
             </p>
@@ -98,7 +104,7 @@ export default function ContactPage() {
             {/* Right Column: Send Enquiry Form */}
             <div className="col-lg-8">
               <div className="bg-white p-4 p-md-5 rounded-4 shadow-sm border-0 h-100">
-                <h4 className="fw-semibold mb-4 text-dark">Send Enquiry</h4>
+                <h2 className="fw-semibold h4 mb-4 text-dark">Send Enquiry</h2>
                 
                 <form>
                   <div className="mb-4">

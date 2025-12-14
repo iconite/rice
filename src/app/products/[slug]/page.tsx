@@ -1,9 +1,31 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { products } from '@/lib/products';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const product: any = products.find((p) => p.slug === slug) || 
+                       products.flatMap((p) => p.types || []).find((t) => t.slug === slug);
+
+  if (!product) {
+    return {
+      title: 'Product Not Found',
+    };
+  }
+
+  return {
+    title: product.title,
+    description: product.description,
+    openGraph: {
+      images: [product.image],
+    },
+  };
+}
 
 export function generateStaticParams() {
   const mainSlugs = products.map((product) => ({ slug: product.slug }));
@@ -123,10 +145,10 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
                 </span>
               </div>
 
-              <h4 className="fw-semibold mb-3 d-flex align-items-center gap-3 text-dark">
+              <h1 className="fw-semibold h4 mb-3 d-flex align-items-center gap-3 text-dark">
                 {product.title}
                 <i className="bi bi-graph-up-arrow fs-4 text-secondary"></i>
-              </h4>
+              </h1>
 
               <p className="text-secondary lh-lg mb-4">
                 {product.detailedDescription || product.description}
