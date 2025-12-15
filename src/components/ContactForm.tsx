@@ -1,15 +1,47 @@
 "use client";
 
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ContactForm() {
   const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // In future, you can trigger an API call here before navigation
-    router.push("/contact/success");
+    setSubmitting(true);
+
+    const form = e.currentTarget;
+    const formData = {
+      name: (form.querySelector("#name") as HTMLInputElement).value,
+      email: (form.querySelector("#email") as HTMLInputElement).value,
+      productType: (form.querySelector("#productType") as HTMLSelectElement)
+        .value,
+      quantity: (form.querySelector("#quantity") as HTMLInputElement).value,
+      destination: (form.querySelector("#destination") as HTMLInputElement)
+        .value,
+      message: (form.querySelector("#message") as HTMLTextAreaElement).value,
+    };
+
+    try {
+      const response = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit enquiry");
+      }
+
+      router.push("/contact/success");
+    } catch (error) {
+      console.error("Error submitting enquiry:", error);
+      alert("Failed to submit enquiry. Please try again.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -137,10 +169,18 @@ export default function ContactForm() {
         </div>
 
         <div className="d-flex gap-3">
-          <button type="submit" className="btn btn-primary px-4 py-2">
-            Submit Enquiry
+          <button
+            type="submit"
+            className="btn btn-primary px-4 py-2"
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : "Submit Enquiry"}
           </button>
-          <button type="reset" className="btn btn-outline-secondary px-4 py-2">
+          <button
+            type="reset"
+            className="btn btn-outline-secondary px-4 py-2"
+            disabled={submitting}
+          >
             Clear Form
           </button>
         </div>
