@@ -1,11 +1,13 @@
-import type { Metadata } from 'next';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { getSiteData } from '@/lib/data';
+import type { Metadata } from "next";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import ContactForm from "@/components/ContactForm";
+import { getSiteData } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Contact Us",
-  description: "Get in touch with Iconite Earth for inquiries about our premium products.",
+  description:
+    "Get in touch with Iconite Earth for inquiries about our premium products.",
 };
 
 export default async function ContactPage() {
@@ -14,7 +16,7 @@ export default async function ContactPage() {
   return (
     <>
       <Header />
-      <main className="min-vh-100 pb-5" style={{ backgroundColor: '#FAFAF9' }}>
+      <main className="min-vh-100 pb-5" style={{ backgroundColor: "#FAFAF9" }}>
         {/* Page Header */}
         <section className="py-5 text-center">
           <div className="container">
@@ -30,44 +32,73 @@ export default async function ContactPage() {
             {/* Left Column: Contact Info */}
             <div className="col-lg-4">
               <div className="d-flex flex-column gap-4">
-                
                 {/* Get in Touch Card */}
                 <div className="bg-white p-4 rounded-4 shadow-sm border-0">
                   <h5 className="fw-semibold mb-4 text-dark">Get in Touch</h5>
-                  
+
                   <div className="d-flex align-items-center gap-3 mb-4">
-                    <div className="d-flex align-items-center justify-content-center bg-light rounded-3 text-secondary" style={{ width: 48, height: 48 }}>
+                    <div
+                      className="d-flex align-items-center justify-content-center bg-light rounded-3 text-secondary"
+                      style={{ width: 48, height: 48 }}
+                    >
                       <i className="bi bi-envelope fs-5"></i>
                     </div>
                     <div>
                       <p className="small text-muted mb-0">Email</p>
-                      <a href={`mailto:${contact.email}`} className="text-dark text-decoration-none fw-medium">{contact.email}</a>
+                      <a
+                        href={`mailto:${contact.email}`}
+                        className="text-dark text-decoration-none fw-medium"
+                      >
+                        {contact.email}
+                      </a>
                     </div>
                   </div>
 
                   <div className="d-flex align-items-center gap-3 mb-4">
-                    <div className="d-flex align-items-center justify-content-center bg-light rounded-3 text-secondary" style={{ width: 48, height: 48 }}>
+                    <div
+                      className="d-flex align-items-center justify-content-center bg-light rounded-3 text-secondary"
+                      style={{ width: 48, height: 48 }}
+                    >
                       <i className="bi bi-telephone fs-5"></i>
                     </div>
                     <div>
                       <p className="small text-muted mb-0">Phone</p>
-                      <a href={`tel:${contact.phone.replace(/\D/g, '')}`} className="text-dark text-decoration-none fw-medium">{contact.phone}</a>
+                      <a
+                        href={`tel:${contact.phone.replace(/\D/g, "")}`}
+                        className="text-dark text-decoration-none fw-medium"
+                      >
+                        {contact.phone}
+                      </a>
                     </div>
                   </div>
 
                   <div className="d-flex align-items-center gap-3">
-                    <div className="d-flex align-items-center justify-content-center bg-light rounded-3 text-secondary" style={{ width: 48, height: 48 }}>
+                    <div
+                      className="d-flex align-items-center justify-content-center bg-light rounded-3 text-secondary"
+                      style={{ width: 48, height: 48 }}
+                    >
                       <i className="bi bi-geo-alt fs-5"></i>
                     </div>
                     <div>
                       <p className="small text-muted mb-0">Address</p>
-                      <p className="text-dark mb-0 fw-medium" style={{ whiteSpace: 'pre-line' }}>{contact.address}</p>
+                      <p
+                        className="text-dark mb-0 fw-medium"
+                        style={{ whiteSpace: "pre-line" }}
+                      >
+                        {contact.address}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 {/* WhatsApp Card */}
-                <div className="p-4 rounded-4 shadow-sm border-0" style={{ backgroundColor: '#eefcf3', border: '1px solid #c3e6cb' }}>
+                <div
+                  className="p-4 rounded-4 shadow-sm border-0"
+                  style={{
+                    backgroundColor: "#eefcf3",
+                    border: "1px solid #c3e6cb",
+                  }}
+                >
                   <div className="d-flex align-items-center gap-2 mb-3">
                     <i className="bi bi-whatsapp fs-4 text-success"></i>
                     <h5 className="fw-semibold mb-0 text-success">WhatsApp</h5>
@@ -86,7 +117,7 @@ export default async function ContactPage() {
                     <i className="bi bi-clock fs-5"></i>
                     <h5 className="fw-semibold mb-0">Business Hours</h5>
                   </div>
-                  
+
                   <div className="d-flex justify-content-between mb-2 small opacity-75">
                     <span>Monday - Friday</span>
                     <span>9:00 - 18:00</span>
@@ -100,67 +131,15 @@ export default async function ContactPage() {
                     <span>Closed</span>
                   </div>
                 </div>
-
               </div>
             </div>
 
             {/* Right Column: Send Enquiry Form */}
             <div className="col-lg-8">
               <div className="bg-white p-4 p-md-5 rounded-4 shadow-sm border-0 h-100">
-                <h2 className="fw-semibold h4 mb-4 text-dark">Send Enquiry</h2>
-                
-                <form>
-                  <div className="mb-4">
-                    <label htmlFor="name" className="form-label small fw-medium text-dark">Name *</label>
-                    <input type="text" className="form-control py-2 bg-light border-light" id="name" placeholder="Your full name" />
-                  </div>
-
-                  <div className="mb-4">
-                    <label htmlFor="email" className="form-label small fw-medium text-dark">Email *</label>
-                    <input type="email" className="form-control py-2 bg-light border-light" id="email" placeholder="your.email@example.com" />
-                  </div>
-
-                  <div className="mb-4">
-                    <label htmlFor="productType" className="form-label small fw-medium text-dark">Product Type *</label>
-                    <select className="form-select py-2 bg-light border-light text-secondary" id="productType" defaultValue="">
-                      <option value="" disabled>Select product...</option>
-                      <option value="rice">Rice</option>
-                      <option value="spices">Spices</option>
-                      <option value="fruit-veg">Fruits & Vegetables</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div className="mb-4">
-                    <label htmlFor="quantity" className="form-label small fw-medium text-dark">Quantity *</label>
-                    <input type="text" className="form-control py-2 bg-light border-light" id="quantity" placeholder="e.g., 100 kg, 1 ton, 20 containers" />
-                  </div>
-
-                  <div className="mb-4">
-                    <label htmlFor="destination" className="form-label small fw-medium text-dark">Destination (Location or Pincode) *</label>
-                    <input type="text" className="form-control py-2 bg-light border-light" id="destination" placeholder="City, Country or Pincode" />
-                  </div>
-
-                  <div className="mb-4">
-                    <label htmlFor="message" className="form-label small fw-medium text-dark">Additional Message (Optional)</label>
-                    <textarea className="form-control py-2 bg-light border-light" id="message" rows={4} placeholder="Any specific requirements or questions..."></textarea>
-                  </div>
-
-                  <div className="mb-4 form-check">
-                    <input type="checkbox" className="form-check-input" id="consent" />
-                    <label className="form-check-label small text-secondary" htmlFor="consent">
-                      I agree to the processing of my information for the purpose of responding to my inquiry and understand that this form is not meant for collecting sensitive personal data. *
-                    </label>
-                  </div>
-
-                  <div className="d-flex gap-3">
-                    <button type="submit" className="btn btn-primary px-4 py-2">Submit Enquiry</button>
-                    <button type="reset" className="btn btn-outline-secondary px-4 py-2">Clear Form</button>
-                  </div>
-                </form>
+                <ContactForm />
               </div>
             </div>
-
           </div>
         </div>
       </main>
