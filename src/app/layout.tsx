@@ -19,15 +19,28 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: {
     default: "Iconite Earth - Global Export & Delivery",
-    template: "%s | Iconite Earth"
+    template: "%s | Iconite Earth",
   },
-  description: "Serving customers worldwide with JDC shipping and consistent quality that meets international standards.",
-  keywords: ["export", "shipping", "spices", "rice", "global trade", "agriculture"],
+  description:
+    "Serving customers worldwide with JDC shipping and consistent quality that meets international standards.",
+  keywords: [
+    "export",
+    "shipping",
+    "spices",
+    "rice",
+    "global trade",
+    "agriculture",
+  ],
+  icons: {
+    icon: "/favicon.jpg",
+    shortcut: "/favicon.jpg",
+    apple: "/favicon.jpg",
+  },
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    siteName: 'Iconite Earth'
-  }
+    type: "website",
+    locale: "en_US",
+    siteName: "Iconite Earth",
+  },
 };
 
 export default function RootLayout({

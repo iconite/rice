@@ -57,6 +57,7 @@ export default function AdminPage() {
   const [loadingEnquiries, setLoadingEnquiries] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [productTypeFilter, setProductTypeFilter] = useState<string>("all");
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Product Editing State
   const [editingProduct, setEditingProduct] = useState<Product | null>(null); // The main product being edited
@@ -135,6 +136,7 @@ export default function AdminPage() {
   };
 
   const uploadImage = async (file: File): Promise<string | null> => {
+    setUploadingImage(true);
     const formData = new FormData();
     formData.append("file", file);
     try {
@@ -142,12 +144,29 @@ export default function AdminPage() {
         method: "POST",
         body: formData,
       });
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        const errorData = await res
+          .json()
+          .catch(() => ({ error: "Upload failed" }));
+        throw new Error(errorData.error || "Upload failed");
+      }
       const json = await res.json();
+      if (!json.url) {
+        console.error("No URL in response:", json);
+        alert("Upload succeeded but no URL returned");
+        setUploadingImage(false);
+        return null;
+      }
+      setUploadingImage(false);
       return json.url;
     } catch (err) {
-      console.error(err);
-      alert("Image upload failed");
+      console.error("Upload error:", err);
+      alert(
+        `Image upload failed: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
+      setUploadingImage(false);
       return null;
     }
   };
@@ -189,6 +208,8 @@ export default function AdminPage() {
         .replace(/[^\w-]/g, "");
     }
 
+    console.log("Saving product with image:", editingProduct.image); // Debug log
+
     const newProducts = [...data.products];
     if (isNewProduct) {
       newProducts.push(editingProduct);
@@ -196,7 +217,10 @@ export default function AdminPage() {
       newProducts[editIndex] = editingProduct;
     }
 
-    await saveData({ ...data, products: newProducts });
+    const dataToSave = { ...data, products: newProducts };
+    console.log("Data being saved:", JSON.stringify(dataToSave, null, 2)); // Debug log
+
+    await saveData(dataToSave);
     setEditingProduct(null);
   };
 
@@ -301,26 +325,53 @@ export default function AdminPage() {
             className="form-control"
             value={item.image}
             onChange={(e) => handleDetailChange("image", e.target.value, isSub)}
+            placeholder="Image URL or upload file"
           />
           <input
             type="file"
             className="form-control"
             accept="image/*"
+            disabled={uploadingImage}
             onChange={async (e) => {
               if (e.target.files?.[0]) {
-                const url = await uploadImage(e.target.files[0]);
-                if (url) handleDetailChange("image", url, isSub);
+                const file = e.target.files[0];
+                console.log("Uploading file:", file.name);
+                const url = await uploadImage(file);
+                console.log("Uploaded URL:", url);
+                if (url) {
+                  handleDetailChange("image", url, isSub);
+                  console.log("Image URL set in state:", url);
+                } else {
+                  console.error("Failed to get URL from upload");
+                }
+                // Reset the file input so the same file can be selected again
+                e.target.value = "";
               }
             }}
           />
         </div>
-        {item.image && (
-          <img
-            src={item.image}
-            alt="Preview"
-            className="mt-2"
-            style={{ maxHeight: 100 }}
-          />
+        {uploadingImage && (
+          <div className="mt-2 text-muted small">
+            <i className="bi bi-arrow-up-circle me-1"></i>Uploading image...
+          </div>
+        )}
+        {item.image && item.image.trim() !== "" && (
+          <div className="mt-2">
+            <img
+              src={item.image}
+              alt="Preview"
+              className="rounded border"
+              style={{ maxHeight: 100 }}
+              onError={(e) => {
+                console.error("Image failed to load:", item.image);
+                e.currentTarget.style.display = "none";
+              }}
+            />
+            <div className="mt-1 small text-muted">
+              <i className="bi bi-check-circle text-success me-1"></i>
+              Image URL: {item.image.substring(0, 50)}...
+            </div>
+          </div>
         )}
       </div>
       <div className="col-12">

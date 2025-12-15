@@ -6,19 +6,19 @@
 
 :root {
   /* Brand Colors */
-  --primary-color: #133F40;
-  --secondary-color: #F4EDDC;
-  --text-dark: #0A0A0ACC;
+  --primary-color: #133f40;
+  --secondary-color: #f4eddc;
+  --text-dark: #0a0a0acc;
   --text-light: #666666;
   --white: #ffffff;
   --border-color: #e0e0e0;
-  
+
   /* Bootstrap Overrides */
-  --bs-primary: #2C5F5D;
+  --bs-primary: #2c5f5d;
   --bs-primary-rgb: 44, 95, 93;
-  --bs-body-bg: #F5F1E8;
+  --bs-body-bg: #f5f1e8;
   --bs-body-color: #666666;
-  --bs-link-color: #2C5F5D;
+  --bs-link-color: #2c5f5d;
   --bs-link-hover-color: #234d4b;
 }
 
@@ -30,7 +30,7 @@ body {
   color: var(--bs-body-color);
 }
 
-a, 
+a,
 button,
 .btn {
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
@@ -43,31 +43,51 @@ a {
 
 p {
   font-weight: 400;
-  font-style: normal;        
+  font-style: normal;
 }
-
 
 .btn-primary {
   background-color: var(--primary-color);
   border-radius: 8px;
-  border-color: #2C5F5D;
+  border-color: #2c5f5d;
 }
 
 .btn-primary:hover {
-  background-color: #2C5F5D;
+  background-color: #2c5f5d;
   border-radius: 8px;
 }
 
-.text-green{
-  color: #133F40;
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:focus-visible,
+.btn-primary.active,
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active {
+  background-color: var(--primary-color) !important;
+  border-color: #2c5f5d !important;
+  box-shadow: none !important;
+  color: #fff !important;
 }
 
-.bg-secondary{
-  background-color: #F4EDDC !important;
+.btn-primary:focus-visible {
+  outline: none !important;
 }
 
-.bg-info{
-  background-color: #FAFAF8 !important;
+.btn-primary:not(:disabled):not(.disabled):active:focus,
+.btn-primary:not(:disabled):not(.disabled).active:focus {
+  box-shadow: none !important;
+}
+
+.text-green {
+  color: #133f40;
+}
+
+.bg-secondary {
+  background-color: #f4eddc !important;
+}
+
+.bg-info {
+  background-color: #fafaf8 !important;
 }
 
 #hero::before {
@@ -81,18 +101,17 @@ p {
 #hero {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;           /* matches image ratio */
-  background-image:
-    url('/cover-image.jpg');
+  aspect-ratio: 16 / 9; /* matches image ratio */
+  background-image: url("/cover-image.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-.primary-font { 
-    font-family: var(--font-montserrat), system-ui, -apple-system, sans-serif !important;
+.primary-font {
+  font-family: var(--font-montserrat), system-ui, -apple-system, sans-serif !important;
 }
 
-.secondary-font { 
-    font-family: var(--font-inter), system-ui, -apple-system, sans-serif !important;
+.secondary-font {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif !important;
 }

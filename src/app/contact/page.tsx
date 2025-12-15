@@ -106,9 +106,17 @@ export default async function ContactPage() {
                   <p className="text-secondary small mb-3">
                     Connect with us instantly on WhatsApp for faster responses
                   </p>
-                  <button className="btn btn-success w-100 fw-medium py-2">
+                  <a
+                    href={`https://wa.me/${contact.whatsapp.replace(
+                      /[^0-9]/g,
+                      ""
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-success w-100 fw-medium py-2 text-decoration-none"
+                  >
                     <i className="bi bi-whatsapp me-2"></i> Chat on WhatsApp
-                  </button>
+                  </a>
                 </div>
 
                 {/* Business Hours Card */}
