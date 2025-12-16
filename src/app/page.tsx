@@ -32,7 +32,7 @@ export default async function Home() {
         {/* Hero Section */}
         <section id="hero" className="hero position-relative d-flex align-items-center text-white" >
           {/* <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div> */}
-          <div className="container position-relative z-2">
+          <div className="container position-relative z-2 my-5">
             <div >
               <h1 className="fw-semibold mb-4 ls-1 hero-title text-center">GLOBAL EXPORT & DELIVERY</h1>
               <h3 className="fw-medium mb-5 opacity-75 hero-subtitle text-center">
