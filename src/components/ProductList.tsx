@@ -76,8 +76,8 @@ export default function ProductList({ products }: ProductListProps) {
               <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
               <input
                   type="text"
-                  className="form-control form-control-lg border shadow-sm ps-5"
-                  placeholder="Search products, sub-categories, origins..."
+                  className="form-control border shadow-sm ps-5"
+                  placeholder="Search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
               />
