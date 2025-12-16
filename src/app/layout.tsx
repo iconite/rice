@@ -3,6 +3,7 @@ import { Montserrat, Inter } from "next/font/google"; // Import both fonts
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./globals.css";
+import BootstrapClient from "@/components/BootstrapClient";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -51,6 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${montserrat.variable} ${inter.variable}`}>
+        <BootstrapClient />
         {children}
       </body>
     </html>
