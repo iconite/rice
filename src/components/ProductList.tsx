@@ -72,10 +72,11 @@ export default function ProductList({ products }: ProductListProps) {
     <>
       <div className="container mb-5">
            {/* Search Bar - Integrated here for direct interaction */}
-           <div className="mb-4">
+           <div className="mb-4 position-relative">
+              <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
               <input
                   type="text"
-                  className="form-control form-control-lg border shadow-sm"
+                  className="form-control form-control-lg border shadow-sm ps-5"
                   placeholder="Search products, sub-categories, origins..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

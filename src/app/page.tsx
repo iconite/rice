@@ -34,22 +34,22 @@ export default async function Home() {
           {/* <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div> */}
           <div className="container position-relative z-2">
             <div >
-              <h1 className="display-4 fw-semibold mb-4 ls-1">GLOBAL EXPORT & DELIVERY</h1>
-              <h3 className="fw-medium mb-5 opacity-75">
+              <h1 className="fw-semibold mb-4 ls-1 hero-title text-center">GLOBAL EXPORT & DELIVERY</h1>
+              <h3 className="fw-medium mb-5 opacity-75 hero-subtitle text-center">
                 Serving customers worldwide with JDC shipping and consistent<br className="d-none d-md-block" />
                 quality that meets international standards.
               </h3>
-              <div className="d-flex gap-3  flex-wrap">
-                <Link href="/products" className="btn btn-primary px-4 shadow-sm primary-font p-3 text-decoration-none">View Products <i className="bi bi-arrow-right ms-2"></i></Link>
-                <Link href="/contact" className="btn btn-light px-4 primary-font p-3 text-decoration-none">Contact Us</Link>
+              <div className="d-flex gap-3  flex-wrap justify-content-center">
+                <Link href="/products" className="btn btn-primary px-4 shadow-sm primary-font p-3 text-decoration-none hero-btn">View Products <i className="bi bi-arrow-right ms-2"></i></Link>
+                <Link href="/contact" className="btn btn-light px-4 primary-font p-3 text-decoration-none hero-btn">Contact Us</Link>
               </div>
             </div>
           </div>
-          <div className="position-absolute bottom-0 start-50 translate-middle-x mb-4 d-flex gap-2 z-3">
+          {/* <div className="position-absolute bottom-0 start-50 translate-middle-x mb-4 d-flex gap-2 z-3">
             <span className="bg-white opacity-50 rounded-circle" style={{ width: 10, height: 10, cursor: 'pointer' }}></span>
             <span className="bg-white rounded-pill" style={{ width: 30, height: 10, cursor: 'pointer' }}></span>
             <span className="bg-white opacity-50 rounded-circle" style={{ width: 10, height: 10, cursor: 'pointer' }}></span>
-          </div>
+          </div> */}
         </section>
 
         {/* About Section */}

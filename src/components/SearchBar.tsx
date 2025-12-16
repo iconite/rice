@@ -38,13 +38,16 @@ export default function SearchBar({ popularTags }: SearchBarProps) {
       <div className="container">
         <form onSubmit={handleSearch}>
           <div className="d-flex gap-3 mb-3">
-            <input
-              type="text"
-              className="form-control form-control-lg border-end-0 bg-white"
-              placeholder="Search for products, spices, grains..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <div className="position-relative flex-grow-1">
+              <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+              <input
+                type="text"
+                className="form-control border-0 bg-white ps-5 shadow-sm"
+                placeholder="Search for products, spices, grains..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
             <button type="submit" className="btn btn-primary px-5 fw-medium">
               Search
             </button>
