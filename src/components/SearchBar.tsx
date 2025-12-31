@@ -43,7 +43,7 @@ export default function SearchBar({ popularTags }: SearchBarProps) {
               <input
                 type="text"
                 className="form-control border-0 bg-white ps-5 shadow-sm"
-                placeholder="Search "
+                placeholder="Search for products, makhana, spices, coconut, etc."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

@@ -57,8 +57,7 @@ export default async function Home() {
           <div className="container py-4 text-center">
             <h2 className="display-6 fw-semibold text-dark mb-4">About Iconite Earth</h2>
             <p className="text-muted mx-auto mb-5 lh-lg" style={{ maxWidth: 900 }}>
-              Iconite Earth is a trusted export partner that specializes in delivering high-quality agricultural products to customers worldwide. With a commitment to excellence and sustainability, we source the finest spices, grains, and organic products directly from certified farms. Our mission is to bridge the gap between local farmers and global markets, ensuring that every product meets international standards while supporting sustainable farming practices. We take pride in our rigorous quality control processes and our ability to deliver fresh, authentic products that preserve their natural flavors and nutritional value.
-            </p>
+ Iconite Earth is a dynamic Indian exporting company, committed to delivering premium - quality products to market across the globe. Specializing in the export of premium quality of makahana fox nut, coconut, spices and other agricultural products. We partner directly with farmers to ensure authenticity, freshness and sustainability in every product. Our state-of-the-art facilities and rigorous quality control processes guarantee that you receive only the finest products, with seamless international logistics            </p>
           </div>
         </section>
 

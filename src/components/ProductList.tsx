@@ -77,7 +77,7 @@ export default function ProductList({ products }: ProductListProps) {
               <input
                   type="text"
                   className="form-control border shadow-sm ps-5"
-                  placeholder="Search"
+                  placeholder="Search for products, makhana, spices, coconut, etc."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
               />
