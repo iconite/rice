@@ -316,7 +316,8 @@ export default async function ProductDetailsPage({
         </div>
 
         {/* Details Section */}
-        <div className="container mb-5">
+
+        {/* <div className="container mb-5">
           <h3 className="fw-semibold mb-3 text-dark">Details</h3>
           <p className="text-secondary lh-lg mb-0">
             This variety is known for its exceptional quality and unique
@@ -325,7 +326,7 @@ export default async function ProductDetailsPage({
             grain quality and optimal yields. Our rigorous quality control
             ensures that only the best products reach your table.
           </p>
-        </div>
+        </div> */}
 
         {/* Enquiry Bar */}
         <div className="container mb-5">
