@@ -1,5 +1,7 @@
 
-import db from './db';
+import { db } from './drizzle';
+import { eq } from 'drizzle-orm';
+import { config, products, subProducts, varieties } from './schema';
 import { Product, ProductType } from './products';
 
 export interface SiteData {
@@ -15,37 +17,52 @@ export interface SiteData {
 export async function getSiteData(): Promise<SiteData> {
   try {
     // Get Contact
-    const contactRow = db.prepare("SELECT value FROM config WHERE key = 'contact'").get() as { value: string } | undefined;
-    const contact = contactRow ? JSON.parse(contactRow.value) : {
+    const contactConfig = await db.query.config.findFirst({
+        where: eq(config.key, 'contact')
+    });
+    
+    const contact = contactConfig?.value ? JSON.parse(contactConfig.value) : {
       email: '',
       phone: '',
       address: '',
       whatsapp: ''
     };
 
-    // Get Products
-    const products = db.prepare('SELECT * FROM products').all().map((p: any) => ({
-        ...p,
-        isHighDemand: Boolean(p.isHighDemand)
-    })) as Product[];
+    // Get Products with relations
+    const productsData = await db.query.products.findMany({
+        with: {
+            varieties: true,
+            subProducts: true,
+        }
+    });
 
-    // Hydrate Products with Relations
-    const getVarieties = db.prepare('SELECT name FROM varieties WHERE product_slug = ?');
-    const getSubProducts = db.prepare('SELECT * FROM sub_products WHERE parent_slug = ?');
+    const mappedProducts: Product[] = productsData.map(p => ({
+        slug: p.slug,
+        title: p.title || '',
+        origin: p.origin || '',
+        description: p.description || '',
+        detailedDescription: p.detailedDescription || '',
+        image: p.image || '',
+        climate: p.climate || '',
+        growingSeason: p.growingSeason || '',
+        yield: p.yield || '',
+        isHighDemand: p.isHighDemand || false,
+        varieties: p.varieties.map(v => v.name || ''),
+        types: p.subProducts.map(t => ({
+             slug: t.slug,
+             title: t.title || '',
+             origin: t.origin || '',
+             description: t.description || '',
+             detailedDescription: t.detailedDescription || '',
+             image: t.image || '',
+             climate: t.climate || '',
+             growingSeason: t.growingSeason || '',
+             yield: t.yield || '',
+             isHighDemand: t.isHighDemand || false
+        }))
+    }));
 
-    for (const p of products) {
-        // Varieties
-        const varietyRows = getVarieties.all(p.slug) as { name: string }[];
-        p.varieties = varietyRows.map(v => v.name);
-
-        // Types (Sub Products)
-        p.types = getSubProducts.all(p.slug).map((t: any) => ({
-             ...t,
-             isHighDemand: Boolean(t.isHighDemand)
-        })) as ProductType[];
-    }
-
-    return { contact, products };
+    return { contact, products: mappedProducts };
   } catch (error) {
     console.error('Error reading site data from DB:', error);
     throw new Error('Failed to read site data');
@@ -53,73 +70,68 @@ export async function getSiteData(): Promise<SiteData> {
 }
 
 export async function saveSiteData(data: SiteData): Promise<void> {
-  const insertProduct = db.prepare(`
-        INSERT INTO products (slug, title, origin, description, detailedDescription, image, climate, growingSeason, yield, isHighDemand)
-        VALUES (@slug, @title, @origin, @description, @detailedDescription, @image, @climate, @growingSeason, @yield, @isHighDemand)
-    `);
-    
-  const insertSubProduct = db.prepare(`
-        INSERT INTO sub_products (slug, parent_slug, title, origin, description, detailedDescription, image, climate, growingSeason, yield, isHighDemand)
-        VALUES (@slug, @parent_slug, @title, @origin, @description, @detailedDescription, @image, @climate, @growingSeason, @yield, @isHighDemand)
-    `);
+    try {
+        await db.transaction(async (tx) => {
+             // 1. Update Contact
+             await tx.insert(config).values({
+                 key: 'contact',
+                 value: JSON.stringify(data.contact)
+             }).onConflictDoUpdate({
+                 target: config.key,
+                 set: { value: JSON.stringify(data.contact) }
+             });
 
-  const insertVariety = db.prepare('INSERT INTO varieties (product_slug, name) VALUES (?, ?)');
-  const updateContact = db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('contact', ?)");
+             // 2. Clear existing tables (Full overwrite strategy as requested by previous logic)
+             await tx.delete(varieties);
+             await tx.delete(subProducts);
+             await tx.delete(products);
 
-  const saveTransaction = db.transaction((newData: SiteData) => {
-      // 1. Update Contact
-      updateContact.run(JSON.stringify(newData.contact));
+             // 3. Insert new data
+             for (const p of data.products) {
+                 await tx.insert(products).values({
+                    slug: p.slug,
+                    title: p.title,
+                    origin: p.origin,
+                    description: p.description,
+                    detailedDescription: p.detailedDescription,
+                    image: p.image,
+                    climate: p.climate,
+                    growingSeason: p.growingSeason,
+                    yield: p.yield,
+                    isHighDemand: p.isHighDemand
+                 });
 
-      // 2. Clear existing tables (Full overwrite strategy)
-      db.prepare('DELETE FROM varieties').run();
-      db.prepare('DELETE FROM sub_products').run();
-      db.prepare('DELETE FROM products').run();
+                 if (p.varieties && p.varieties.length > 0) {
+                     await tx.insert(varieties).values(
+                         p.varieties.map(v => ({
+                             productSlug: p.slug,
+                             name: v
+                         }))
+                     );
+                 }
 
-      // 3. Insert new data
-      for (const p of newData.products) {
-            insertProduct.run({
-                slug: p.slug,
-                title: p.title,
-                origin: p.origin,
-                description: p.description,
-                detailedDescription: p.detailedDescription || null,
-                image: p.image,
-                climate: p.climate || null,
-                growingSeason: p.growingSeason || null,
-                yield: p.yield || null,
-                isHighDemand: p.isHighDemand ? 1 : 0
-            });
-
-            if (p.varieties && Array.isArray(p.varieties)) {
-                for (const v of p.varieties) {
-                    insertVariety.run(p.slug, v);
-                }
-            }
-
-            if (p.types && Array.isArray(p.types)) {
-                for (const t of p.types) {
-                    insertSubProduct.run({
-                        slug: t.slug,
-                        parent_slug: p.slug,
-                        title: t.title,
-                        origin: t.origin,
-                        description: t.description,
-                        detailedDescription: t.detailedDescription || null,
-                        image: t.image,
-                        climate: t.climate || null,
-                        growingSeason: t.growingSeason || null,
-                        yield: t.yield || null,
-                        isHighDemand: t.isHighDemand ? 1 : 0
-                    });
-                }
-            }
-      }
-  });
-
-  try {
-    saveTransaction(data);
-  } catch (error) {
-    console.error('Error saving site data to DB:', error);
-    throw new Error('Failed to save site data');
-  }
+                 if (p.types && p.types.length > 0) {
+                     await tx.insert(subProducts).values(
+                         p.types.map(t => ({
+                             slug: t.slug,
+                             parentSlug: p.slug,
+                             title: t.title,
+                             origin: t.origin,
+                             description: t.description,
+                             detailedDescription: t.detailedDescription,
+                             image: t.image,
+                             climate: t.climate,
+                             growingSeason: t.growingSeason,
+                             yield: t.yield,
+                             isHighDemand: t.isHighDemand
+                         }))
+                     );
+                 }
+             }
+        });
+    } catch (error) {
+        console.error('Error saving site data to DB:', error);
+        throw new Error('Failed to save site data');
+    }
 }
+

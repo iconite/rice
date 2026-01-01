@@ -1,0 +1,4 @@
+id,name,email,product_type,quantity,destination,message,created_at
+1,Shanthanu Nagesh,shanthanucn@gmail.com,rice,20,560059,"I want a bag full of rice please
+",2025-12-15 12:35:03
+2,Shanthanu ,shanthanu@gmail.com,spices,1 ton,560059,this is a test message,2025-12-15 12:41:56

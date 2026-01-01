@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { db as drizzleDb } from "@/lib/drizzle";
+import { messages } from "@/lib/schema";
 
 export async function POST(request: Request) {
   try {
@@ -15,12 +17,15 @@ export async function POST(request: Request) {
     }
 
     // Insert message into database
-    const stmt = db.prepare(`
-      INSERT INTO messages (name, email, product_type, quantity, destination, message)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
+    await drizzleDb.insert(messages).values({
+        name,
+        email,
+        productType,
+        quantity,
+        destination,
+        message: message || null
+    });
 
-    stmt.run(name, email, productType, quantity, destination, message || null);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -1,9 +1,14 @@
 
 import bcrypt from 'bcryptjs';
-import db from './db';
+import { db } from './drizzle';
+import { users } from './schema';
+import { eq } from 'drizzle-orm';
 
-export function getUser(username: string) {
-    return db.prepare('SELECT * FROM users WHERE username = ?').get(username) as { id: number, username: string, password_hash: string } | undefined;
+export async function getUser(username: string) {
+    const user = await db.query.users.findFirst({
+        where: eq(users.username, username)
+    });
+    return user;
 }
 
 export function verifyPassword(password: string, hash: string) {
