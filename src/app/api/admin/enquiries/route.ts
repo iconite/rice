@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { db } from "@/lib/db";
+import { messages } from "@/lib/schema";
+import { desc } from "drizzle-orm";
 
 export async function GET() {
   try {
-    const messages = db
-      .prepare(`SELECT * FROM messages ORDER BY created_at DESC`)
-      .all();
+    const allMessages = await db.select().from(messages).orderBy(desc(messages.createdAt));
 
-    return NextResponse.json(messages);
+    return NextResponse.json(allMessages);
   } catch (error) {
     console.error("Error fetching enquiries:", error);
     return NextResponse.json(

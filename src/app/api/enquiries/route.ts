@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { db } from "@/lib/db";
+import { messages } from "@/lib/schema";
 
 export async function POST(request: Request) {
   try {
@@ -15,12 +16,14 @@ export async function POST(request: Request) {
     }
 
     // Insert message into database
-    const stmt = db.prepare(`
-      INSERT INTO messages (name, email, product_type, quantity, destination, message)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(name, email, productType, quantity, destination, message || null);
+    await db.insert(messages).values({
+      name,
+      email,
+      productType,
+      quantity,
+      destination,
+      message: message || null,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

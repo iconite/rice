@@ -242,11 +242,11 @@ export default async function ProductDetailsPage({
 
             {/* Right Column: Details */}
             <div className="col-lg-6">
-              <div className="d-flex align-items-start justify-content-between mb-3">
+              {/* <div className="d-flex align-items-start justify-content-between mb-3">
                 <span className="badge bg-light text-dark border border-secondary fw-medium px-3 py-2 rounded-pill small">
                   PREMIUM PRODUCT
                 </span>
-              </div>
+              </div> */}
 
               <h1 className="fw-semibold h4 mb-3 d-flex align-items-center gap-3 text-dark">
                 {product.title}
