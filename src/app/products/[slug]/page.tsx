@@ -49,7 +49,7 @@ export default async function ProductDetailsPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { products } = await getSiteData();
+  const { products, certificates } = await getSiteData();
 
   // Find product and potentially its parent
   let product: any = products.find((p) => p.slug === slug);
@@ -351,55 +351,57 @@ export default async function ProductDetailsPage({
           <div className="container text-center">
             <h3 className="fw-semibold mb-5 text-dark">Our Certifications</h3>
             <div className="row g-4 justify-content-center">
-              {[
-                {
-                  title: "ISO 22000:2018",
-                  text: "Food Safety Management",
-                  icon: "bi-shield-check",
-                },
-                {
-                  title: "FSSAI Certified",
-                  text: "Food Safety Standards",
-                  icon: "bi-award",
-                },
-                {
-                  title: "Organic Certified",
-                  text: "Certified Organic Products",
-                  icon: "bi-patch-check",
-                },
-                {
-                  title: "HACCP",
-                  text: "Hazard Analysis Critical Control",
-                  icon: "bi-shield-shaded",
-                },
-                {
-                  title: "GMP Certified",
-                  text: "Good Manufacturing Practice",
-                  icon: "bi-gear-wide-connected",
-                },
-              ].map((cert, idx) => (
-                <div key={idx} className="col-md-2 col-6">
-                  <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
-                    <div
-                      className="mb-3 rounded-circle d-flex align-items-center justify-content-center"
-                      style={{
-                        width: 50,
-                        height: 50,
-                        backgroundColor: "#E0E7E7",
-                      }}
-                    >
-                      <i className={`bi ${cert.icon} fs-4 text-primary`}></i>
-                    </div>
-                    <h6 className="fw-semibold mb-2 small">{cert.title}</h6>
-                    <p
-                      className="text-muted small mb-0 lh-sm"
-                      style={{ fontSize: "0.75rem" }}
-                    >
-                      {cert.text}
-                    </p>
+              {certificates && certificates.length > 0 ? (
+                certificates.map((cert, idx) => (
+                  <div key={idx} className="col-md-2 col-6">
+                     {cert.link ? (
+                        <a href={cert.link} target="_blank" className="text-decoration-none text-dark h-100 d-block">
+                           <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center hover-scale transition-all">
+                              <div
+                                className="mb-3 rounded-circle d-flex align-items-center justify-content-center"
+                                style={{
+                                  width: 50,
+                                  height: 50,
+                                  backgroundColor: "#E0E7E7",
+                                }}
+                              >
+                                <i className={`bi ${cert.icon} fs-4 text-primary`}></i>
+                              </div>
+                              <h6 className="fw-semibold mb-2 small">{cert.title}</h6>
+                              <p
+                                className="text-muted small mb-0 lh-sm"
+                                style={{ fontSize: "0.75rem" }}
+                              >
+                                {cert.text}
+                              </p>
+                           </div>
+                        </a>
+                     ) : (
+                        <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                          <div
+                            className="mb-3 rounded-circle d-flex align-items-center justify-content-center"
+                            style={{
+                              width: 50,
+                              height: 50,
+                              backgroundColor: "#E0E7E7",
+                            }}
+                          >
+                            <i className={`bi ${cert.icon} fs-4 text-primary`}></i>
+                          </div>
+                          <h6 className="fw-semibold mb-2 small">{cert.title}</h6>
+                          <p
+                            className="text-muted small mb-0 lh-sm"
+                            style={{ fontSize: "0.75rem" }}
+                          >
+                            {cert.text}
+                          </p>
+                        </div>
+                     )}
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                 <div className="col-12 text-muted">No certifications available.</div>
+              )}
             </div>
           </div>
         </section>

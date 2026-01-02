@@ -1,51 +1,53 @@
-import { NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
-import { Readable } from 'stream';
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { supabase } from '@/lib/supabase';
 
-// Cloudinary Config
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file') as File | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
+    // File validation
+    if (file.size > 50 * 1024 * 1024) {  // 50MB max
+      return NextResponse.json({ error: 'File too large (>50MB)' }, { status: 400 });
+    }
 
-    // Upload to Cloudinary using a stream
-    const result: any = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                folder: 'rice_products', // Optional folder in Cloudinary
-            },
-            (error, result) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            }
-        );
+    const cookieStore = cookies();
+    
 
-        // Convert buffer to readable stream
-        const stream = new Readable();
-        stream.push(buffer);
-        stream.push(null); // End of stream
-        stream.pipe(uploadStream);
+    // Unique filename: timestamp-original.ext
+    const fileExt = file.name.split('.').pop() || 'png';
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+    const filePath = `${fileName}`;  // Matches your Cloudinary folder
+
+    const { data, error } = await supabase.storage
+      .from('Certificates')  // Your bucket name (create if missing)
+      .upload(filePath, Buffer.from(await file.arrayBuffer()), {
+        cacheControl: '3600',  // 1hr cache
+        upsert: false,
+      });
+
+    if (error) {
+      console.error('Supabase upload error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('Certificates')
+      .getPublicUrl(filePath);
+
+    return NextResponse.json({ 
+      url: urlData.publicUrl,
+      path: filePath 
     });
 
-    return NextResponse.json({ url: result.secure_url });
-
-  } catch (error) {
+  } catch (error: any) {
     console.error('Upload error:', error);
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Upload failed' }, { status: 500 });
   }
 }

@@ -60,3 +60,12 @@ export const messages = pgTable('messages', {
   message: text('message'),
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+// Certificates
+export const certificates = pgTable('certificates', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  text: text('text').notNull(),
+  icon: text('icon').notNull(),
+  link: text('link'),
+});

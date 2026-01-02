@@ -30,9 +30,17 @@ interface ContactInfo {
   whatsapp: string;
 }
 
+interface Certificate {
+  title: string;
+  text: string; // text description
+  icon: string;
+  link?: string | null;
+}
+
 interface SiteData {
   contact: ContactInfo;
   products: Product[];
+  certificates?: Certificate[];
 }
 
 interface Message {
@@ -51,13 +59,20 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    "contact" | "products" | "enquiries"
+    "contact" | "products" | "enquiries" | "certificates"
   >("contact");
   const [enquiries, setEnquiries] = useState<Message[]>([]);
   const [loadingEnquiries, setLoadingEnquiries] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [productTypeFilter, setProductTypeFilter] = useState<string>("all");
+
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Certificate State
+  const [editingCertificate, setEditingCertificate] =
+    useState<Certificate | null>(null);
+  const [editCertIndex, setEditCertIndex] = useState<number>(-1);
+  const [isNewCertificate, setIsNewCertificate] = useState(false);
 
   // Product Editing State
   const [editingProduct, setEditingProduct] = useState<Product | null>(null); // The main product being edited
@@ -169,6 +184,59 @@ export default function AdminPage() {
       setUploadingImage(false);
       return null;
     }
+  };
+
+  // --- Certificate Handlers ---
+
+  const handleEditCertificate = (index: number) => {
+    if (!data || !data.certificates) return;
+    setEditingCertificate({ ...data.certificates[index] });
+    setEditCertIndex(index);
+    setIsNewCertificate(false);
+  };
+
+  const handleCreateCertificate = () => {
+    setEditingCertificate({
+      title: "",
+      text: "",
+      icon: "bi-shield-check",
+      link: "",
+    });
+    setEditCertIndex(-1);
+    setIsNewCertificate(true);
+  };
+
+  const saveCertificate = async () => {
+    if (!data || !editingCertificate) return;
+
+    const newCertificates = [...(data.certificates || [])];
+
+    // Ensure null if empty string for link
+    if (editingCertificate.link === "") editingCertificate.link = null;
+
+    if (isNewCertificate) {
+      newCertificates.push(editingCertificate);
+    } else {
+      newCertificates[editCertIndex] = editingCertificate;
+    }
+
+    const dataToSave = { ...data, certificates: newCertificates };
+    await saveData(dataToSave);
+    setEditingCertificate(null);
+  };
+
+  const handleDeleteCertificate = async (index: number) => {
+    if (!data || !data.certificates || !confirm("Delete this certificate?"))
+      return;
+    const newCertificates = [...data.certificates];
+    newCertificates.splice(index, 1);
+    await saveData({ ...data, certificates: newCertificates });
+  };
+
+  const handleCertChange = (field: keyof Certificate, value: string) => {
+    setEditingCertificate((prev) =>
+      prev ? { ...prev, [field]: value } : null
+    );
   };
 
   // --- Main Product Handlers ---
@@ -504,6 +572,16 @@ export default function AdminPage() {
               onClick={() => setActiveTab("enquiries")}
             >
               Enquiries
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link ${
+                activeTab === "certificates" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("certificates")}
+            >
+              Certificates
             </button>
           </li>
         </ul>
@@ -949,6 +1027,132 @@ export default function AdminPage() {
             )}
           </div>
         )}
+
+        {activeTab === "certificates" && (
+            <div>
+              {!editingCertificate && (
+                <div className="mb-4 d-flex justify-content-between align-items-center">
+                  <h4>Certifications</h4>
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleCreateCertificate}
+                  >
+                    <i className="bi bi-plus-lg me-2"></i>Add Certificate
+                  </button>
+                </div>
+              )}
+  
+              {editingCertificate && (
+                 <div className="card border-primary mb-4">
+                  <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 className="mb-0">
+                      {isNewCertificate ? "Add Certificate" : "Edit Certificate"}
+                    </h5>
+                    <button
+                      className="btn btn-sm btn-light"
+                      onClick={() => setEditingCertificate(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <div className="card-body">
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label className="form-label">Title</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingCertificate.title}
+                          onChange={(e) => handleCertChange("title", e.target.value)}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Icon (Bootstrap Class)</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingCertificate.icon}
+                          onChange={(e) => handleCertChange("icon", e.target.value)}
+                          placeholder="bi-shield-check"
+                        />
+                      </div>
+                      <div className="col-12">
+                         <label className="form-label">Description Text</label>
+                         <textarea
+                            className="form-control"
+                            rows={2}
+                            value={editingCertificate.text}
+                            onChange={(e) => handleCertChange("text", e.target.value)}
+                         ></textarea>
+                      </div>
+                      <div className="col-12">
+                        <label className="form-label">Document Link (PDF/Doc)</label>
+                        <div className="input-group">
+                           <input
+                              type="text"
+                              className="form-control"
+                              value={editingCertificate.link || ''}
+                              onChange={(e) => handleCertChange("link", e.target.value)}
+                              placeholder="Upload a document..."
+                           />
+                           <input
+                              type="file"
+                              className="form-control"
+                              disabled={uploadingImage}
+                              onChange={async (e) => {
+                                if (e.target.files?.[0]) {
+                                  const file = e.target.files[0];
+                                  const url = await uploadImage(file);
+                                  if (url) handleCertChange("link", url);
+                                  e.target.value = "";
+                                }
+                              }}
+                           />
+                        </div>
+                        {uploadingImage && <div className="text-muted small mt-1">Uploading...</div>}
+                      </div>
+                    </div>
+                    <div className="mt-4 text-end">
+                       <button className="btn btn-success" onClick={saveCertificate} disabled={saving || uploadingImage}>
+                          {saving ? "Saving..." : "Save Certificate"}
+                       </button>
+                    </div>
+                  </div>
+                 </div>
+              )}
+  
+              {!editingCertificate && (
+                <div className="row g-4">
+                  {data?.certificates?.map((cert, idx) => (
+                    <div key={idx} className="col-md-4">
+                       <div className="card h-100 shadow-sm">
+                          <div className="card-body text-center">
+                             <div className="mb-3 rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                                  style={{ width: 60, height: 60, backgroundColor: "#E0E7E7" }}>
+                                <i className={`bi ${cert.icon} fs-3 text-primary`}></i>
+                             </div>
+                             <h5 className="card-title">{cert.title}</h5>
+                             <p className="card-text small text-muted">{cert.text}</p>
+                             {cert.link && (
+                                <a href={cert.link} target="_blank" className="btn btn-link btn-sm">View Document</a>
+                             )}
+                          </div>
+                          <div className="card-footer bg-white border-top-0 d-flex justify-content-between">
+                             <button className="btn btn-outline-primary btn-sm" onClick={() => handleEditCertificate(idx)}>Edit</button>
+                             <button className="btn btn-outline-danger btn-sm" onClick={() => handleDeleteCertificate(idx)}>Delete</button>
+                          </div>
+                       </div>
+                    </div>
+                  ))}
+                  {(!data?.certificates || data.certificates.length === 0) && (
+                     <div className="col-12 text-center text-muted py-5">
+                        No certifications found. Add one to display on the product/home page.
+                     </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
       </div>
     </div>
   );

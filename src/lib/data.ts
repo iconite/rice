@@ -1,5 +1,5 @@
 import { db } from './db';
-import { config, products, subProducts, varieties } from './schema';
+import { config, products, subProducts, varieties, certificates } from './schema';
 import { Product, ProductType } from './products';
 import { eq } from 'drizzle-orm';
 
@@ -11,6 +11,15 @@ export interface SiteData {
     whatsapp: string;
   };
   products: Product[];
+  certificates: Certificate[];
+}
+
+export interface Certificate {
+  id?: number;
+  title: string;
+  text: string;
+  icon: string;
+  link?: string | null;
 }
 
 export async function getSiteData(): Promise<SiteData> {
@@ -79,7 +88,10 @@ export async function getSiteData(): Promise<SiteData> {
       });
     }
 
-    return { contact, products: productsWithRelations };
+    // Get Certificates
+    const certificatesData = await db.select().from(certificates);
+
+    return { contact, products: productsWithRelations, certificates: certificatesData };
   } catch (error) {
     console.error('Error reading site data from DB:', error);
     throw new Error('Failed to read site data');
@@ -104,6 +116,7 @@ export async function saveSiteData(data: SiteData): Promise<void> {
     await db.delete(varieties);
     await db.delete(subProducts);
     await db.delete(products);
+    await db.delete(certificates);
 
     // 3. Insert new data
     for (const p of data.products) {
@@ -150,6 +163,19 @@ export async function saveSiteData(data: SiteData): Promise<void> {
         }
       }
     }
+
+    // 4. Insert Certificates
+    if (data.certificates && Array.isArray(data.certificates)) {
+      for (const c of data.certificates) {
+        await db.insert(certificates).values({
+          title: c.title,
+          text: c.text,
+          icon: c.icon,
+          link: c.link || null,
+        });
+      }
+    }
+
   } catch (error) {
     console.error('Error saving site data to DB:', error);
     throw new Error('Failed to save site data');
