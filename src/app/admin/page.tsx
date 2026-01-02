@@ -54,6 +54,19 @@ interface Message {
   createdAt: string;
 }
 
+const CERTIFICATE_ICONS = [
+  { value: "bi-patch-check-fill", label: "Verified / Patch" },
+  { value: "bi-award-fill", label: "Award" },
+  { value: "bi-shield-fill-check", label: "Secure / Certified" },
+  { value: "bi-flower1", label: "Organic / Natural" },
+  { value: "bi-globe-americas", label: "Global Standard" },
+  { value: "bi-check-circle-fill", label: "Approved / Check" },
+  { value: "bi-trophy-fill", label: "Excellence / Trophy" },
+  { value: "bi-file-earmark-text", label: "Document / File" },
+  { value: "bi-star-fill", label: "Star / Premium" },
+  { value: "bi-lightning-charge-fill", label: "Fast / Energy" },
+];
+
 export default function AdminPage() {
   const [data, setData] = useState<SiteData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1068,14 +1081,24 @@ export default function AdminPage() {
                         />
                       </div>
                       <div className="col-md-6">
-                        <label className="form-label">Icon (Bootstrap Class)</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={editingCertificate.icon}
-                          onChange={(e) => handleCertChange("icon", e.target.value)}
-                          placeholder="bi-shield-check"
-                        />
+
+                        <label className="form-label">Icon</label>
+                        <div className="input-group">
+                          <span className="input-group-text bg-light">
+                            <i className={`bi ${editingCertificate.icon} fs-5 text-primary`}></i>
+                          </span>
+                          <select
+                            className="form-select"
+                            value={editingCertificate.icon}
+                            onChange={(e) => handleCertChange("icon", e.target.value)}
+                          >
+                            {CERTIFICATE_ICONS.map((icon) => (
+                              <option key={icon.value} value={icon.value}>
+                                {icon.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                       <div className="col-12">
                          <label className="form-label">Description Text</label>
