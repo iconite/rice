@@ -2,6 +2,7 @@ import { db } from './db';
 import { config, products, subProducts, varieties } from './schema';
 import { Product, ProductType } from './products';
 import { eq } from 'drizzle-orm';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export interface SiteData {
   contact: {
@@ -13,22 +14,10 @@ export interface SiteData {
   products: Product[];
 }
 
-let cachedSiteData: SiteData | null = null;
-
 export async function getSiteData(): Promise<SiteData> {
-  if (cachedSiteData) {
-    return cachedSiteData;
-  }
+  noStore();
 
   try {
-    // Parallelize queries was causing timeouts in dev, switching to sequential
-    // const [contactRows, productsData, varietiesData, subProductsData] = await Promise.all([
-    //   db.select().from(config).where(eq(config.key, 'contact')).limit(1),
-    //   db.select().from(products),
-    //   db.select().from(varieties),
-    //   db.select().from(subProducts)
-    // ]);
-    
     // Sequential execution to be safer
     const contactRows = await db.select().from(config).where(eq(config.key, 'contact')).limit(1);
     const productsData = await db.select().from(products);
@@ -94,8 +83,7 @@ export async function getSiteData(): Promise<SiteData> {
       };
     });
 
-    cachedSiteData = { contact, products: productsWithRelations };
-    return cachedSiteData;
+    return { contact, products: productsWithRelations };
   } catch (error) {
     console.error('Error reading site data from DB:', error);
     throw new Error('Failed to read site data');
@@ -166,9 +154,6 @@ export async function saveSiteData(data: SiteData): Promise<void> {
         }
       }
     }
-    
-    // Invalidate cache
-    cachedSiteData = null;
   } catch (error) {
     console.error('Error saving site data to DB:', error);
     throw new Error('Failed to save site data');
