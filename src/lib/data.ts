@@ -166,6 +166,9 @@ export async function saveSiteData(data: SiteData): Promise<void> {
         }
       }
     }
+    
+    // Invalidate cache
+    cachedSiteData = null;
   } catch (error) {
     console.error('Error saving site data to DB:', error);
     throw new Error('Failed to save site data');
