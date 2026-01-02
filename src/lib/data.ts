@@ -2,6 +2,7 @@ import { db } from './db';
 import { config, products, subProducts, varieties, certificates } from './schema';
 import { Product, ProductType } from './products';
 import { eq } from 'drizzle-orm';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export interface SiteData {
   contact: {
@@ -22,22 +23,10 @@ export interface Certificate {
   link?: string | null;
 }
 
-let cachedSiteData: SiteData | null = null;
-
 export async function getSiteData(): Promise<SiteData> {
-  if (cachedSiteData) {
-    return cachedSiteData;
-  }
+  noStore();
 
   try {
-    // Parallelize queries was causing timeouts in dev, switching to sequential
-    // const [contactRows, productsData, varietiesData, subProductsData] = await Promise.all([
-    //   db.select().from(config).where(eq(config.key, 'contact')).limit(1),
-    //   db.select().from(products),
-    //   db.select().from(varieties),
-    //   db.select().from(subProducts)
-    // ]);
-    
     // Sequential execution to be safer
     const contactRows = await db.select().from(config).where(eq(config.key, 'contact')).limit(1);
     const productsData = await db.select().from(products);
