@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
+  staticPageGenerationTimeout: 180,
 };
 
 export default nextConfig;

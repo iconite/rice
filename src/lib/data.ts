@@ -13,18 +13,35 @@ export interface SiteData {
   products: Product[];
 }
 
+let cachedSiteData: SiteData | null = null;
+
 export async function getSiteData(): Promise<SiteData> {
+  if (cachedSiteData) {
+    return cachedSiteData;
+  }
+
   try {
-    // Get Contact
-    const contactRow = await db.select().from(config).where(eq(config.key, 'contact')).limit(1);
+    // Parallelize queries was causing timeouts in dev, switching to sequential
+    // const [contactRows, productsData, varietiesData, subProductsData] = await Promise.all([
+    //   db.select().from(config).where(eq(config.key, 'contact')).limit(1),
+    //   db.select().from(products),
+    //   db.select().from(varieties),
+    //   db.select().from(subProducts)
+    // ]);
     
+    // Sequential execution to be safer
+    const contactRows = await db.select().from(config).where(eq(config.key, 'contact')).limit(1);
+    const productsData = await db.select().from(products);
+    const varietiesData = await db.select().from(varieties);
+    const subProductsData = await db.select().from(subProducts);
+    
+    // Process Contact
     let contact;
     try {
-      const rawValue = contactRow[0]?.value;
+      const rawValue = contactRows[0]?.value;
       // Guard against corrupted data or empty values
       if (rawValue && rawValue !== '[object Object]') {
          contact = typeof rawValue === 'string' ? JSON.parse(rawValue) : rawValue;
-        // contact = JSON.parse(rawValue);
       } else {
         throw new Error("Invalid or corrupted contact data");
       }
@@ -38,32 +55,30 @@ export async function getSiteData(): Promise<SiteData> {
       };
     }
 
-    // Get Products
-    const productsData = await db.select().from(products);
-    const productsWithRelations: Product[] = [];
+    // Hydrate Products with Relations (In-Memory Join)
+    const productsWithRelations: Product[] = productsData.map(p => {
+      // Get Varieties for this product
+      const pVarieties = varietiesData
+        .filter(v => v.productSlug === p.slug)
+        .map(v => v.name || '');
 
-    // Hydrate Products with Relations
-    for (const p of productsData) {
-      // Get Varieties
-      const varietyRows = await db.select().from(varieties).where(eq(varieties.productSlug, p.slug));
-      const varietiesList = varietyRows.map(v => v.name || '');
+      // Get Types (Sub Products) for this product
+      const pTypes = subProductsData
+        .filter(t => t.parentSlug === p.slug)
+        .map(t => ({
+          slug: t.slug || '',
+          title: t.title || '',
+          origin: t.origin || '',
+          description: t.description || '',
+          detailedDescription: t.detailedDescription || undefined,
+          image: t.image || '',
+          climate: t.climate || undefined,
+          growingSeason: t.growingSeason || undefined,
+          yield: t.yield || undefined,
+          isHighDemand: Boolean(t.isHighDemand),
+        }));
 
-      // Get Types (Sub Products)
-      const subProductsData = await db.select().from(subProducts).where(eq(subProducts.parentSlug, p.slug));
-      const types: ProductType[] = subProductsData.map(t => ({
-        slug: t.slug || '',
-        title: t.title || '',
-        origin: t.origin || '',
-        description: t.description || '',
-        detailedDescription: t.detailedDescription || undefined,
-        image: t.image || '',
-        climate: t.climate || undefined,
-        growingSeason: t.growingSeason || undefined,
-        yield: t.yield || undefined,
-        isHighDemand: Boolean(t.isHighDemand),
-      }));
-
-      productsWithRelations.push({
+      return {
         slug: p.slug || '',
         title: p.title || '',
         origin: p.origin || '',
@@ -74,12 +89,13 @@ export async function getSiteData(): Promise<SiteData> {
         growingSeason: p.growingSeason || undefined,
         yield: p.yield || undefined,
         isHighDemand: Boolean(p.isHighDemand),
-        varieties: varietiesList,
-        types,
-      });
-    }
+        varieties: pVarieties,
+        types: pTypes,
+      };
+    });
 
-    return { contact, products: productsWithRelations };
+    cachedSiteData = { contact, products: productsWithRelations };
+    return cachedSiteData;
   } catch (error) {
     console.error('Error reading site data from DB:', error);
     throw new Error('Failed to read site data');

@@ -39,11 +39,11 @@ interface Message {
   id: number;
   name: string;
   email: string;
-  product_type: string;
+  productType: string;
   quantity: string;
   destination: string;
   message: string | null;
-  created_at: string;
+  createdAt: string;
 }
 
 export default function AdminPage() {
@@ -817,8 +817,9 @@ export default function AdminPage() {
                         >
                           <option value="all">All Product Types</option>
                           {Array.from(
-                            new Set(enquiries.map((e) => e.product_type))
+                            new Set(enquiries.map((e) => e.productType))
                           )
+                            .filter((type): type is string => !!type)
                             .sort()
                             .map((type) => (
                               <option key={type} value={type}>
@@ -837,7 +838,7 @@ export default function AdminPage() {
                     // Product type filter
                     if (
                       productTypeFilter !== "all" &&
-                      enquiry.product_type !== productTypeFilter
+                      enquiry.productType !== productTypeFilter
                     ) {
                       return false;
                     }
@@ -848,7 +849,7 @@ export default function AdminPage() {
                       const searchableText = `
                         ${enquiry.name} 
                         ${enquiry.email} 
-                        ${enquiry.product_type} 
+                        ${enquiry.productType} 
                         ${enquiry.destination} 
                         ${enquiry.quantity}
                         ${enquiry.message || ""}
@@ -898,7 +899,7 @@ export default function AdminPage() {
                                 </div>
                                 <small className="text-muted">
                                   {new Date(
-                                    enquiry.created_at
+                                    enquiry.createdAt
                                   ).toLocaleString()}
                                 </small>
                               </div>
@@ -909,7 +910,7 @@ export default function AdminPage() {
                                       Product Type
                                     </label>
                                     <p className="mb-0 fw-medium">
-                                      {enquiry.product_type}
+                                      {enquiry.productType}
                                     </p>
                                   </div>
                                   <div className="col-md-6">
