@@ -168,8 +168,7 @@ export async function saveSiteData(data: SiteData): Promise<void> {
       }
     }
     
-    // Invalidate cache
-    cachedSiteData = null;
+    
 
     // 4. Insert Certificates
     if (data.certificates && Array.isArray(data.certificates)) {
