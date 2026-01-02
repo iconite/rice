@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
       .upload(filePath, Buffer.from(await file.arrayBuffer()), {
         cacheControl: '3600',  // 1hr cache
         upsert: false,
+        contentType: 'application/pdf'
       });
 
     if (error) {
