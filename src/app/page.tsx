@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import ProductCard from '@/components/ProductCard';
+import HeroSlider from '@/components/HeroSlider';
 import { getSiteData } from '@/lib/data';
 
 
@@ -31,6 +32,7 @@ export default async function Home() {
       <main>
         {/* Hero Section */}
         <section id="hero" className="hero position-relative d-flex align-items-center text-white" >
+          <HeroSlider />
           {/* <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div> */}
           <div className="container position-relative z-2 my-5">
             <div >

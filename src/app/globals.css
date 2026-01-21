@@ -96,16 +96,22 @@ p {
   inset: 0;
   background: rgba(0, 0, 0, 0.5); /* adjust opacity */
   pointer-events: none;
+  z-index: 1; /* Sits above slider, below text content */
 }
 
 #hero {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9; /* matches image ratio */
-  background-image: url("/cover-image.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  min-height: 100vh; /* Full viewport height */
+  background-color: #0c1a1a; 
+  overflow: hidden;
+}
+
+/* Ensure React Bootstrap Carousel inner elements take full height */
+.hero-carousel,
+.hero-carousel .carousel-inner,
+.hero-carousel .carousel-item {
+  height: 100% !important;
 }
 
 .primary-font {
