@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s | Iconite Earth",
   },
   description:
-    "Serving customers worldwide with JDC shipping and consistent quality that meets international standards.",
+    "Serving customers worldwide with shipping and consistent quality that meets international standards.",
   keywords: [
     "export",
     "shipping",

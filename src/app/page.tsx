@@ -41,7 +41,7 @@ export default async function Home() {
             <div >
               <h1 className="fw-semibold mb-4 ls-1 hero-title text-center">GLOBAL EXPORT & DELIVERY</h1>
               <h3 className="fw-medium mb-5 opacity-75 hero-subtitle text-center">
-                Serving customers worldwide with JDC shipping and consistent<br className="d-none d-md-block" />
+                Serving customers worldwide with shipping and consistent<br className="d-none d-md-block" />
                 quality that meets international standards.
               </h3>
               <div className="d-flex gap-3  flex-wrap justify-content-center">
