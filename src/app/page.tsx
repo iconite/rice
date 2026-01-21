@@ -9,12 +9,15 @@ import { getSiteData } from '@/lib/data';
 
 export default async function Home() {
   const { products } = await getSiteData();
-  // Sort products: High Demand first, then others. Slice to first 3.
+  // Sort products: High Demand first, then by priority (low first). Slice to first 3.
   const displayProducts = [...products]
     .sort((a, b) => {
         // High Demand first
-        if (a.isHighDemand === b.isHighDemand) return 0;
-        return a.isHighDemand ? -1 : 1;
+        if (a.isHighDemand !== b.isHighDemand) {
+            return a.isHighDemand ? -1 : 1;
+        }
+        // Then by priority
+        return (a.priority || 0) - (b.priority || 0);
     })
     .slice(0, 3);
   

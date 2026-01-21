@@ -87,10 +87,14 @@ export async function getSiteData(): Promise<SiteData> {
         growingSeason: p.growingSeason || undefined,
         yield: p.yield || undefined,
         isHighDemand: Boolean(p.isHighDemand),
+        priority: p.priority ?? 0,
         varieties: pVarieties,
         types: pTypes,
       };
     });
+
+    // Sort by priority Ascending (Low first)
+    productsWithRelations.sort((a, b) => (a.priority || 0) - (b.priority || 0));
 
     // Get Certificates
     const certificatesData = await db.select().from(certificates);
@@ -135,7 +139,8 @@ export async function saveSiteData(data: SiteData): Promise<void> {
         climate: p.climate || null,
         growingSeason: p.growingSeason || null,
         yield: p.yield || null,
-        isHighDemand: p.isHighDemand ? 1 : 0
+        isHighDemand: p.isHighDemand ? 1 : 0,
+        priority: p.priority ?? 0
       });
 
       // Insert varieties

@@ -18,6 +18,8 @@ export const products = pgTable('products', {
   growingSeason: text('growingSeason'), // Lowercase
   yield: text('yield'),
   isHighDemand: integer('isHighDemand').default(0), // Lowercase
+  priority: integer('priority').default(0),
+  id: serial('id'),
 });
 
 // Sub Products (Types)

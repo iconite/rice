@@ -16,6 +16,7 @@ interface ProductType {
   yield?: string;
   detailedDescription?: string;
   isHighDemand?: boolean;
+  priority?: number;
 }
 
 interface Product extends ProductType {
@@ -272,6 +273,7 @@ export default function AdminPage() {
       slug: "",
       varieties: [],
       types: [],
+      priority: data?.products.length || 0,
     } as any);
     setEditIndex(-1);
     setIsNewProduct(true);
@@ -507,6 +509,20 @@ export default function AdminPage() {
           value={item.yield || ""}
           onChange={(e) => handleDetailChange("yield", e.target.value, isSub)}
         />
+      </div>
+
+      <div className="col-md-6 mt-3">
+        <label className="form-label">Display Priority (Low numbers first)</label>
+        <input
+          type="number"
+          className="form-control"
+          value={item.priority ?? ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            handleDetailChange("priority", val === "" ? undefined : parseInt(val), isSub);
+          }}
+        />
+        <div className="form-text">Lowest numbers are displayed first.</div>
       </div>
 
       <div className="col-12 mt-3">

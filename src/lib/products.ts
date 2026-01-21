@@ -26,6 +26,7 @@ export interface Product {
   yield?: string;
   detailedDescription?: string;
   isHighDemand?: boolean;
+  priority?: number;
 }
 
 export const products: Product[] = [
